@@ -5,14 +5,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
-import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.toothpick.R;
 import com.example.toothpick.annotation.ApplicationScope;
 import com.example.toothpick.helper.BackpackItemValidator;
+
 import javax.inject.Inject;
+
 import toothpick.Toothpick;
 
-public class AddNewActivity extends AppCompatActivity {
+public class AddNewActivity extends BaseActivity<Integer> {
 
     public final static String NEW_ITEM_NAME_KEY = "name";
 

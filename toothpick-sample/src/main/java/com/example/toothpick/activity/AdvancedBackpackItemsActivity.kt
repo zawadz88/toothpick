@@ -3,7 +3,6 @@ package com.example.toothpick.activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
-import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,6 +14,7 @@ import com.example.toothpick.annotation.ApplicationScope
 import com.example.toothpick.annotation.ViewModelScope
 import com.example.toothpick.helper.NotificationHelper
 import com.example.toothpick.model.Backpack
+import com.example.toothpick.model.DummyDependency
 import com.example.toothpick.viewmodel.BackpackViewModel
 import toothpick.Scope
 import toothpick.ktp.KTP
@@ -26,6 +26,7 @@ import toothpick.ktp.delegate.lazy
 import toothpick.smoothie.lifecycle.closeOnDestroy
 import toothpick.smoothie.viewmodel.closeOnViewModelCleared
 import toothpick.smoothie.viewmodel.installViewModelBinding
+import javax.inject.Inject
 
 /**
  * Advanced version of the BackpackItemsActivity.
@@ -36,7 +37,7 @@ import toothpick.smoothie.viewmodel.installViewModelBinding
  * destroyed, and later recreated, the scope remains unchanged
  * and the backpack instance will be the same.
  */
-class AdvancedBackpackItemsActivity : AppCompatActivity() {
+class AdvancedBackpackItemsActivity : BaseActivity<Int>() {
 
     companion object {
         const val ADD_NEW_REQUEST = 1
@@ -51,6 +52,9 @@ class AdvancedBackpackItemsActivity : AppCompatActivity() {
     //will be injected in the activity scope as the binding
     //is defined there
     val viewAdapter: IBackpackAdapter by inject()
+
+    @Inject
+    lateinit var dummyDependency2: DummyDependency
 
     private lateinit var coordinatorLayout: CoordinatorLayout
 
@@ -67,19 +71,19 @@ class AdvancedBackpackItemsActivity : AppCompatActivity() {
         // 5. Close activity scope when activity is destroyed
         // 6. Inject dependencies
         KTP.openScopes(ApplicationScope::class.java)
-                .openSubScope(ViewModelScope::class.java) { scope: Scope ->
-                    scope.installViewModelBinding<BackpackViewModel>(this)
-                            .closeOnViewModelCleared(this)
-                            .installModules(module {
-                                bind<Backpack>().singleton()
-                            })
-                }
-                .openSubScope(this)
-                .installModules(module {
-                    bind<IBackpackAdapter>().toClass<BackpackAdapter>()
-                })
-                .closeOnDestroy(this)
-                .inject(this)
+            .openSubScope(ViewModelScope::class.java) { scope: Scope ->
+                scope.installViewModelBinding<BackpackViewModel>(this)
+                    .closeOnViewModelCleared(this)
+                    .installModules(module {
+                        bind<Backpack>().singleton()
+                    })
+            }
+            .openSubScope(this)
+            .installModules(module {
+                bind<IBackpackAdapter>().toClass<BackpackAdapter>()
+            })
+            .closeOnDestroy(this)
+            .inject(this)
 
         setupUIComponents()
     }
@@ -96,7 +100,6 @@ class AdvancedBackpackItemsActivity : AppCompatActivity() {
             }
         }
     }
-
 
     private fun setupUIComponents() {
         setContentView(R.layout.backpack_list)
